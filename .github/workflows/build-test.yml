@@ -1042,7 +1042,7 @@ jobs:
     # if: github.event_name == 'push' && github.ref == 'refs/heads/main2'
     # if: github.repository == 'microsoft/vscode-jupyter' && github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.ref, 'refs/heads/release'))
     # needs: [build-vsix, pick_environment, lint, ts_tests, smoke-tests]
-    needs: [pick_environment]
+    needs: [pick_environment, build-vsix]
     environment:
       name: ${{needs.pick_environment.outputs.release_channel}}
     steps:
@@ -1053,10 +1053,55 @@ jobs:
           echo "Release Channel (Environment) is is ${{needs.pick_environment.outputs.release_channel}}"
           echo "VSIX Name is ${{ needs.pick_environment.outputs.vsix_name }}"
 
-    #   - name: Download VSIX
-    #     uses: actions/download-artifact@v2
-    #     with:
-    #       name: ${{needs.pick_environment.outputs.vsix_name}}
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Use Python ${{env.PYTHON_VERSION}}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{env.PYTHON_VERSION}
+
+      - name: Use Node ${{env.NODE_VERSION}}
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: ${{env.NODE_VERSION}}
+
+      - name: Download VSIX
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{needs.pick_environment.outputs.vsix_name}}
+
+    #   - name: Publish
+    #     run: vsce publish --packagePath ${{needs.pick_environment.outputs.vsix_name}} --pat ${{secrets.VSCE_TOKEN}} --noVerify
+
+
+      - name: Extract Extension
+        shell: bash
+        run: |
+          python -c "import zipfile;zip=zipfile.ZipFile('${{needs.pick_environment.outputs.vsix_name}}', 'r');zip.extractall('tmp')"
+
+      - name: Get Version
+        id: version
+        run: |
+          echo ::set-output name=version::$(node -p -e "require('./tmp/extension/package.json').version")
+        shell: bash
+
+      - name: Print version
+        run: |
+          echo ${{steps.version.outputs.version}}
+        shell: bash
+
+      - name: Create GH Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{steps.version.outputs.version}}
+          release_name: Release ${{steps.version.outputs.version}}
+          body_path: tmp/extension/CHANGELOG.md
+          draft: true
+          prerelease: false
 
       - name: Logging
         shell: bash
@@ -1066,7 +1111,7 @@ jobs:
         shell: bash
         run: echo "${{ env.VSCE_TOKEN2 }}"
         env:
-            VSCE_TOKEN2: ${{ secrets.VSCE_TOKEN2 }}
+          VSCE_TOKEN2: ${{ secrets.VSCE_TOKEN2 }}
 
       - name: Logging
         shell: bash

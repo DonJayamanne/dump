@@ -22,7 +22,7 @@ on:
       - 'release/*'
       - 'release-*'
   schedule:
-#   - cron: "0 0 * * *" Every day
+#   - cron: "0 9 * * *" 9am UTC (2am PDT)
     - cron: "* * * * *"
   workflow_dispatch:
 env:

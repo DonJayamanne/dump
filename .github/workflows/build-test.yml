@@ -72,6 +72,7 @@ jobs:
         run: |
           echo "vsix_name=ms-toolsai-jupyter-insiders.vsix" >> $GITHUB_ENV
           echo "test_matrix_os=[\"ubuntu-latest\", \"windows-latest\"]" >> $GITHUB_ENV
+          echo "release_channel=insider" >> $GITHUB_ENV
 
       - name: insiders channel
         # Scheduled builds will publish Insider builds.
@@ -1042,7 +1043,7 @@ jobs:
     # if: github.event_name == 'push' && github.ref == 'refs/heads/main2'
     # if: github.repository == 'microsoft/vscode-jupyter' && github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.ref, 'refs/heads/release'))
     # needs: [build-vsix, pick_environment, lint, ts_tests, smoke-tests]
-    needs: [pick_environment, build-vsix]
+    needs: [pick_environment]
     environment:
       name: ${{needs.pick_environment.outputs.release_channel}}
     steps:
@@ -1066,24 +1067,25 @@ jobs:
         with:
           node-version: ${{env.NODE_VERSION}}
 
-      - name: Download VSIX
-        uses: actions/download-artifact@v2
-        with:
-          name: ${{needs.pick_environment.outputs.vsix_name}}
+    #   - name: Download VSIX
+    #     uses: actions/download-artifact@v2
+    #     with:
+    #       name: ${{needs.pick_environment.outputs.vsix_name}}
 
     #   - name: Publish
     #     run: vsce publish --packagePath ${{needs.pick_environment.outputs.vsix_name}} --pat ${{secrets.VSCE_TOKEN}} --noVerify
 
 
-      - name: Extract Extension
-        shell: bash
-        run: |
-          python -c "import zipfile;zip=zipfile.ZipFile('${{needs.pick_environment.outputs.vsix_name}}', 'r');zip.extractall('tmp')"
+    #   - name: Extract Extension
+    #     shell: bash
+    #     run: |
+    #       python -c "import zipfile;zip=zipfile.ZipFile('${{needs.pick_environment.outputs.vsix_name}}', 'r');zip.extractall('tmp')"
 
       - name: Get Version
         id: version
         run: |
-          echo ::set-output name=version::$(node -p -e "require('./tmp/extension/package.json').version")
+          echo ::set-output name=version::$(node -p -e "require('./package.json').version")
+        #   echo ::set-output name=version::$(node -p -e "require('./tmp/extension/package.json').version")
         shell: bash
 
       - name: Get Changelog

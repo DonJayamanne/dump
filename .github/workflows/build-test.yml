@@ -1091,7 +1091,7 @@ jobs:
       - name: Generate Changelog
         # Just extract change log, anything between `\n## 20` (for each release we have a section with year and month..)
         run: |
-          echo ::set-output name=changelog::$(node -p -e "let fs = require('fs-extra');fs.ensureDirSync('tmp');let changelog = fs.readFileSync('./CHANGELOG.md').toString();changelog = changelog.split('\n## 20')[1].split('\n').filter((_, index) => index > 0).join('\n');fs.writeFileSync('./tmp/RELEASE_CHANGELOG.md', changelog)")
+          echo ::set-output name=changelog::$(node -p -e "let fs = require('fs');let changelog = fs.readFileSync('./CHANGELOG.md').toString();changelog = changelog.split('\n## 20')[1].split('\n').filter((_, index) => index > 0).join('\n');fs.writeFileSync('./RELEASE_CHANGELOG.md', changelog)")
         shell: bash
 
       - name: Print version
@@ -1107,7 +1107,7 @@ jobs:
         with:
           tag_name: ${{steps.version.outputs.version}}
           release_name: Release ${{steps.version.outputs.version}}
-          body_path: tmp/RELEASE_CHANGELOG.md
+          body_path: RELEASE_CHANGELOG.md
           draft: true
           prerelease: false
 

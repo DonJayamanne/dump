@@ -1059,7 +1059,7 @@ jobs:
       - name: Use Python ${{env.PYTHON_VERSION}}
         uses: actions/setup-python@v2
         with:
-          python-version: ${{env.PYTHON_VERSION}
+          python-version: ${{env.PYTHON_VERSION}}
 
       - name: Use Node ${{env.NODE_VERSION}}
         uses: actions/setup-node@v2.1.5

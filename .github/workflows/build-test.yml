@@ -1088,10 +1088,9 @@ jobs:
         #   echo ::set-output name=version::$(node -p -e "require('./tmp/extension/package.json').version")
         shell: bash
 
-      - name: Get Changelog
-        id: changelog
+      - name: Generate Changelog
         run: |
-          echo ::set-output name=changelog::$(node -p -e "const changelog = require('fs').readFileSync('./CHANGELOG.md').toString();console.log('## 20' + changelog.split('\n## 20')[1])")
+          echo ::set-output name=changelog::$(node -p -e "let changelog = require('fs').readFileSync('./CHANGELOG.md').toString();changelog = changelog.split('\n## 20')[1].split('\n').filter((_, index) => index > 0).join('\n');require('fs').writeFileSync('./tmp/RELEASE_CHANGELOG.md', changelog)")
         shell: bash
 
       - name: Print version
@@ -1107,8 +1106,7 @@ jobs:
         with:
           tag_name: ${{steps.version.outputs.version}}
           release_name: Release ${{steps.version.outputs.version}}
-          body: Release ${{steps.changelog.outputs.changelog}}
-        #   body: tmp/extension/CHANGELOG.md
+          body: tmp/RELEASE_CHANGELOG.md
           draft: true
           prerelease: false
 

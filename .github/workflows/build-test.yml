@@ -66,20 +66,24 @@ jobs:
           echo "test_matrix_os=[\"ubuntu-latest\"]" >> $GITHUB_ENV
 
       - name: insiders
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
         # We're not running CI on macOS for now because it's one less matrix entry to lower the number of runners used,
         # macOS runners are expensive, and we assume that Ubuntu is enough to cover the UNIX case.
         run: |
           echo "vsix_name=ms-toolsai-jupyter-insiders.vsix" >> $GITHUB_ENV
           echo "test_matrix_os=[\"ubuntu-latest\", \"windows-latest\"]" >> $GITHUB_ENV
+
+      - name: insiders
+        if: github.event_name == 'schedule' && github.ref == 'refs/heads/mains'
+        run: |
           echo "release_channel=insider" >> $GITHUB_ENV
 
-    #   - name: release
-    #     if: github.event_name == 'push' && contains(github.ref, 'refs/heads/release')
-    #     run: |
-    #       echo "vsix_name=ms-toolsai-jupyter-release.vsix" >> $GITHUB_ENV
-    #       echo "test_matrix_os=[\"ubuntu-latest\"]" >> $GITHUB_ENV
-    #       echo "release_channel=stable" >> $GITHUB_ENV
+      - name: release
+        if: github.event_name == 'push' && contains(github.ref, 'refs/heads/release')
+        run: |
+          echo "vsix_name=ms-toolsai-jupyter-release.vsix" >> $GITHUB_ENV
+          echo "test_matrix_os=[\"ubuntu-latest\"]" >> $GITHUB_ENV
+          echo "release_channel=stable" >> $GITHUB_ENV
 
 #   build-vsix:
 #     needs: pick_environment
@@ -1028,7 +1032,7 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     # This should happen in the release and insiders branch
-    if: github.event_name == 'push'
+    if: needs.pick_environment.outputs.release_channel == 'insider' || needs.pick_environment.outputs.release_channel == 'stable'
     # if: github.event_name == 'push' && github.ref == 'refs/heads/main2'
     # if: github.repository == 'microsoft/vscode-jupyter' && github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.ref, 'refs/heads/release'))
     # needs: [build-vsix, pick_environment, lint, ts_tests, smoke-tests]

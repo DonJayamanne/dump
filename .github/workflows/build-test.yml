@@ -66,7 +66,7 @@ jobs:
           echo "test_matrix_os=[\"ubuntu-latest\"]" >> $GITHUB_ENV
 
       - name: insiders
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main2'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         # We're not running CI on macOS for now because it's one less matrix entry to lower the number of runners used,
         # macOS runners are expensive, and we assume that Ubuntu is enough to cover the UNIX case.
         run: |

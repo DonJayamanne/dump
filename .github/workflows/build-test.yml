@@ -1106,7 +1106,7 @@ jobs:
         with:
           tag_name: ${{steps.version.outputs.version}}
           release_name: Release ${{steps.version.outputs.version}}
-          body: tmp/RELEASE_CHANGELOG.md
+          body_path: tmp/RELEASE_CHANGELOG.md
           draft: true
           prerelease: false
 

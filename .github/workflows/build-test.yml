@@ -1089,8 +1089,9 @@ jobs:
         shell: bash
 
       - name: Generate Changelog
+        # Just extract change log, anything between `\n## 20` (for each release we have a section with year and month..)
         run: |
-          echo ::set-output name=changelog::$(node -p -e "let changelog = require('fs').readFileSync('./CHANGELOG.md').toString();changelog = changelog.split('\n## 20')[1].split('\n').filter((_, index) => index > 0).join('\n');require('fs').writeFileSync('./tmp/RELEASE_CHANGELOG.md', changelog)")
+          echo ::set-output name=changelog::$(node -p -e "let fs = require('fs-extra');fs.ensureDirSync('tmp');let changelog = fs.readFileSync('./CHANGELOG.md').toString();changelog = changelog.split('\n## 20')[1].split('\n').filter((_, index) => index > 0).join('\n');fs.writeFileSync('./tmp/RELEASE_CHANGELOG.md', changelog)")
         shell: bash
 
       - name: Print version

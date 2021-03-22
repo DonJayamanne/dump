@@ -91,50 +91,50 @@ jobs:
         run: |
           echo "release_channel=stable" >> $GITHUB_ENV
 
-#   build-vsix:
-#     needs: pick_environment
-#     name: Build VSIX
-#     runs-on: ubuntu-latest
-#     if: github.repository == 'microsoft/vscode-jupyter'
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v2
+  build-vsix:
+    needs: pick_environment
+    name: Build VSIX
+    runs-on: ubuntu-latest
+    # if: github.repository == 'microsoft/vscode-jupyter'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
 
-#       - name: Use Node ${{env.NODE_VERSION}}
-#         uses: actions/setup-node@v2.1.5
-#         with:
-#           node-version: ${{env.NODE_VERSION}}
+      - name: Use Node ${{env.NODE_VERSION}}
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: ${{env.NODE_VERSION}}
 
-#       - name: Use Python ${{env.PYTHON_VERSION}}
-#         uses: actions/setup-python@v2
-#         with:
-#           python-version: ${{env.PYTHON_VERSION}}
+      - name: Use Python ${{env.PYTHON_VERSION}}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{env.PYTHON_VERSION}}
 
-#       # Caching of npm packages (https://github.com/actions/cache/blob/main/examples.md#node---npm)
-#       - name: Cache npm on linux/mac
-#         uses: actions/cache@v2.1.4
-#         with:
-#           path: ~/.npm
-#           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-#           restore-keys: |
-#             ${{ runner.os }}-node-
+      # Caching of npm packages (https://github.com/actions/cache/blob/main/examples.md#node---npm)
+      - name: Cache npm on linux/mac
+        uses: actions/cache@v2.1.4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
-#       - name: Install Python libs
-#         run: |
-#           python -m pip --disable-pip-version-check install -t ./pythonFiles/lib/python --no-cache-dir --implementation py --no-deps --upgrade -r ./requirements.txt
+      - name: Install Python libs
+        run: |
+          python -m pip --disable-pip-version-check install -t ./pythonFiles/lib/python --no-cache-dir --implementation py --no-deps --upgrade -r ./requirements.txt
 
-#       - name: Build VSIX
-#         uses: ./.github/actions/build-vsix
-#         id: build-vsix
+      - name: Build VSIX
+        uses: ./.github/actions/build-vsix
+        id: build-vsix
 
-#       - name: Rename VSIX for release branch
-#         if: steps.build-vsix.outputs.path != needs.pick_environment.outputs.vsix_name
-#         run: mv ${{ steps.build-vsix.outputs.path }} ${{ needs.pick_environment.outputs.vsix_name }}
+      - name: Rename VSIX for release branch
+        if: steps.build-vsix.outputs.path != needs.pick_environment.outputs.vsix_name
+        run: mv ${{ steps.build-vsix.outputs.path }} ${{ needs.pick_environment.outputs.vsix_name }}
 
-#       - uses: actions/upload-artifact@v2
-#         with:
-#           name: ${{needs.pick_environment.outputs.vsix_name}}
-#           path: ${{needs.pick_environment.outputs.vsix_name}}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{needs.pick_environment.outputs.vsix_name}}
+          path: ${{needs.pick_environment.outputs.vsix_name}}
 
 #   lint:
 #     name: Lint

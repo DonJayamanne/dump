@@ -23,7 +23,7 @@ on:
       - 'release-*'
   schedule:
 #   - cron: "0 0 * * *" Every day
-    - cron: "1 * * * *"
+    - cron: "* * * * *"
   workflow_dispatch:
 env:
   NODE_VERSION: 12.14.1

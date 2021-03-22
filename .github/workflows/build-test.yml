@@ -21,10 +21,10 @@ on:
       - 'release'
       - 'release/*'
       - 'release-*'
-  workflow_dispatch:
   schedule:
 #   - cron: "0 0 * * *" Every day
-  - cron: "1 * * * *"
+    - cron: "1 * * * *"
+  workflow_dispatch:
 env:
   NODE_VERSION: 12.14.1
   PYTHON_VERSION: 3.8
